@@ -33,4 +33,5 @@ class Udacidata
     #remove product from database and return product object
   end
   def self.where
+  end
 end
