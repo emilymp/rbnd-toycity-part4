@@ -1,17 +1,19 @@
 require 'faker'
+require 'csv'
+require_relative 'schema'
+
 
 # This file contains code that populates the database with
 # fake data for testing purposes
 
 def db_seed
-  brands = ["Crayola", "Lego", "Nintendo", "Fisher-Price", "Hasbro"]
-  product_names = ["crayons", "house", "video game", "kitchen", "toy car"] 
-  prices = ["2.00", "14.50", "2.10", "99.99", "19.99"] 
-
-  100.times do
-  # you will write the "create" method as part of your project
-    Product.create( brand: brands.sample, 
-                  name: product_names.sample, 
-                  price: prices.sample )
+  data_path = File.dirname(__FILE__) + "/data.csv"
+  CSV.open(data_path, "a+b") do |csv|
+    10.times do |r|
+      brand = Faker::Company.name
+      product = Faker::Commerce.product_name
+      price = Faker::Commerce.price
+      csv << [r, brand, product, price]
+    end
   end
 end

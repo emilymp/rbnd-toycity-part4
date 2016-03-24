@@ -9,7 +9,7 @@ class TestUdacidata < MiniTest::Test
     CSV.open(@data_path, "wb") do |csv|
       csv << ["id", "brand", "product", "price"]
     end
-    db_seed
+    #db_seed
   end
 
   def test_create_method_adds_to_database
