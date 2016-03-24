@@ -5,22 +5,24 @@ require 'csv'
 class Udacidata
 
   @@data_path = File.dirname(__FILE__) + "/../data/data.csv"
+  @@data_base = {}
+
 
   def self.create(attributes={})
     op = attributes
-    new = self.new(op)
+    new_obj = self.new(op)
     CSV.open(@@data_path, 'a+b') do |csv|
       csv << op.values
     end
-    return new
+    add(new_obj)
+    
   end 
 
   def self.all
-    #returns array of all objects in database of self's data-type
+    @@data_base[self.name.to_sym]
   end
 
   def self.first(n=1)
-    #returns array of first n products
   end
 
   def self.last(n=1)
@@ -35,4 +37,12 @@ class Udacidata
   end
   def self.where
   end
+
+  private 
+
+  def self.add(new_obj)
+    @@data_base.key?(self.name.to_sym) ? @@data_base[self.name.to_sym].push(new_obj) : @@data_base[self.name.to_sym]= [new_obj]
+    return new_obj
+  end
+
 end
