@@ -16,6 +16,7 @@ class Product < Udacidata
     @name = opts[:name]
     @price = opts[:price]
   end
+      
 
   private
 
@@ -33,3 +34,8 @@ class Product < Udacidata
     end
 
 end
+
+
+new_product = Product.new(brand: "WalterToys", name: "Sticky Notes", price: 34.00)
+p new_product.to_csv_row
+
