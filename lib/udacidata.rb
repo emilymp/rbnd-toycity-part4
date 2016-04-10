@@ -5,7 +5,7 @@ require 'csv'
 class Udacidata
 
   @@data_path = File.dirname(__FILE__) + "/../data/data.csv"
-  @@data_base = {}
+  @collection =[]
 
 
   def self.create(attributes={})    
@@ -14,12 +14,12 @@ class Udacidata
     
     new_obj = self.new(attributes)
     
-    add_to_csv(new_obj) 
+    add_to_csv(new_obj) #unless id
     add_to_class_db(new_obj)
   end
 
   def self.all
-    @@data_base[self.name.to_sym]
+    @collection
   end
 
   def self.first(n=1)
@@ -56,7 +56,7 @@ class Udacidata
 
   
   def self.add_to_class_db(new_obj)
-    @@data_base.key?(self.name.to_sym) ? @@data_base[self.name.to_sym].push(new_obj) : @@data_base[self.name.to_sym] = [new_obj]
+    @collection.push(new_obj) unless @collection.include? new_obj
     return new_obj
   end
 

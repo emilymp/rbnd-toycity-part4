@@ -1,9 +1,8 @@
 class Module
   def create_finder_methods(*attributes)
-    #parse attributes
-
-
+  end
     # Your code goes here!
     # Hint: Remember attr_reader and class_eval
-  end
 end
+
+
