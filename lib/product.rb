@@ -1,4 +1,5 @@
 require_relative 'udacidata'
+require_relative '../data/schema'
 
 class Product < Udacidata
   attr_reader :id, :price, :brand, :name
@@ -36,8 +37,3 @@ class Product < Udacidata
     end
 
 end
-
-
-new_product = Product.new(brand: "WalterToys", name: "Sticky Notes", price: 34.00)
-p new_product.to_csv_row
-

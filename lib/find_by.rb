@@ -5,4 +5,3 @@ class Module
     # Hint: Remember attr_reader and class_eval
 end
 
-

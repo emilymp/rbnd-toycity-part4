@@ -5,44 +5,61 @@ require 'csv'
 class Udacidata
 
   @@data_path = File.dirname(__FILE__) + "/../data/data.csv"
-  @collection =[]
 
 
-  def self.create(attributes={})    
-    id = get_id_csv(attributes)
-    attributes[:id] = id if id
-    
+  def self.create(attributes={})       
     new_obj = self.new(attributes)
-    
-    add_to_csv(new_obj) #unless id
-    add_to_class_db(new_obj)
+    add_to_csv(new_obj) unless in_csv?(new_obj)
+    new_obj  
+  end
+
+  def self.create_from_row(row)
+    keys = row.headers
+    values = row.fields
+    self.new(Hash[keys.zip(values)])
   end
 
   def self.all
-    @collection
+    new_array = []
+    CSV.table(@@data_path).each do |row|
+      new_array << row
+    end
+    new_array.map! { |row| self.create_from_row(row) }
   end
 
   def self.first(n=1)
+    objects = self.all
+    n > 1 ? objects.take(n) : objects[0]
+
   end
 
   def self.last(n=1)
-    #returns array of last n products
+    objects = self.all
+    range_start = objects.length - n
+    n > 1 ? objects[range_start..-1] : objects[-1]
   end
   
   def self.find(id)
-    #returns product with input id
+    self.all[id - 1]
   end
 
   def self.destroy(id)
-    #remove product from database and return product object
+    table = CSV.table(@@data_path)
+    deleted_row = table.delete((id - 1))
+  
+    CSV.open(@@data_path, "w+b") do |csv|
+      csv << table.headers
+      table.each do |row|
+        csv << row
+      end
+    end
+    return self.create_from_row(deleted_row)
   end
 
   def self.where
   end
 
-  def to_csv_row
-    CSV::Row.new(attr_keys, attr_values)
-  end
+  
 
   def attr_keys
     instance_variables.map { |key| key.to_s[1..-1].to_sym }
@@ -52,20 +69,15 @@ class Udacidata
     instance_variables.map { |key| instance_variable_get(key) }
   end
 
+
   private
 
-  
-  def self.add_to_class_db(new_obj)
-    @collection.push(new_obj) unless @collection.include? new_obj
-    return new_obj
-  end
-
-  def self.get_id_csv(attributes)
-    selected = {}
+  def self.in_csv?(new_obj)
+    selected = false
     CSV.table(@@data_path).each do |row|
-      selected = row if row.fields(attributes.keys.to_s) == attributes.values
+      selected = true if row.fields(new_obj.attr_keys.to_s) == new_obj.attr_values
     end
-    return selected[:id]
+    return selected
   end
 
   def self.add_to_csv(new_obj)
