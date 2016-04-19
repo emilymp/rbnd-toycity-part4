@@ -7,9 +7,9 @@ class Udacidata
   @@data_path = File.dirname(__FILE__) + "/../data/data.csv"
   
   class << self
-    def create(attributes={})       
-      new_obj = new(attributes)
-      add_to_csv(new_obj) unless in_csv?(new_obj)
+    def create(*attributes)       
+      new_obj = new(*attributes)
+      append_to_csv(new_obj) unless new_obj.in_csv?
       new_obj  
     end
 
@@ -43,16 +43,7 @@ class Udacidata
     end
 
     def destroy(id)
-      objects = all
-      deleted_object = objects.slice!(id - 1)
-  
-      CSV.open(@@data_path, "w+b") do |csv|
-        csv << objects[0].attr_keys
-        objects.each do |object|
-          csv << object.attr_values
-        end
-      end
-      return deleted_object
+      replace(id)
     end
 
     def where(op={})
@@ -64,21 +55,44 @@ class Udacidata
       found_objects.reduce(:&)
     end
 
-    private
-
-    def in_csv?(new_obj)
-      selected = false
-      CSV.table(@@data_path).each do |row|
-        selected = true if row.fields(new_obj.attr_keys.to_s) == new_obj.attr_values
-      end
-      return selected
-    end
-
-    def add_to_csv(new_obj)
-      CSV.open(@@data_path, 'a+b') do |csv|
-        csv << new_obj.attr_values
+    def append_to_csv(*objects)
+      CSV.open(@@data_path, 'a+b') do |csv|         
+        objects.each do |object|      
+          csv << object.attr_values
+        end
       end
     end
+
+    def clean_csv(headers)
+      CSV.open(@@data_path, "w+b") do |csv|
+        csv << headers
+      end
+    end
+
+    def replace(id, new_obj = false)
+      objects = all
+      return_object = objects.slice!(id - 1)
+      
+      if new_obj
+        objects.insert((id - 1), new_obj) 
+        return_object = new_obj
+      end
+      
+      clean_csv(objects[0].attr_keys)
+      append_to_csv(*objects)     
+      
+      return return_object
+    end
+
+  end
+
+
+  def in_csv?
+    selected = false
+    CSV.table(@@data_path).each do |row|
+      selected = true if row.fields(*self.attr_keys) == self.attr_values
+    end
+    return selected
   end
 
 
@@ -90,5 +104,12 @@ class Udacidata
     instance_variables.map { |key| instance_variable_get(key) }
   end
 
+  def update(op={})
+    old_id = self.attr_values[0]
+    op.each do |key, val|
+      self.send("#{key}=".to_sym, val)
+    end
+    self.class.replace(old_id, self)
+  end
 
 end

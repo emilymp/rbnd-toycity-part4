@@ -3,7 +3,7 @@ require_relative '../data/schema'
 
 
 class Product < Udacidata
-  attr_reader :id, :price, :brand, :name
+  attr_accessor :id, :price, :brand, :name
 
   def initialize(opts={})
 
