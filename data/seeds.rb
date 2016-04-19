@@ -13,7 +13,7 @@ def db_seed
       brand = Faker::Company.name
       product = Faker::Commerce.product_name
       price = Faker::Commerce.price
-      csv << [r+1, brand, product, price]
+      csv << [r+1, brand, name, price]
     end
   end
 end

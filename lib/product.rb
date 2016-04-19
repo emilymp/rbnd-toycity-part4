@@ -1,10 +1,9 @@
 require_relative 'udacidata'
 require_relative '../data/schema'
 
+
 class Product < Udacidata
   attr_reader :id, :price, :brand, :name
-
-  @collection = []
 
   def initialize(opts={})
 
