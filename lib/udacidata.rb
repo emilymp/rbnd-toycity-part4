@@ -95,6 +95,9 @@ class Udacidata
     return selected
   end
 
+  def print_ready_string
+    self.attr_keys.zip(attr_values).each { |pair| pair.join(": ") }.join(", ")
+  end
 
   def attr_keys
     instance_variables.map { |key| key.to_s[1..-1].to_sym }
