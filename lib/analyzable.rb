@@ -6,12 +6,20 @@ module Analyzable
   end
 
   def print_report(objects_array)
-    objects_array.map { |object| object.print_ready_string }.join("\n")
+    objects_array.map { |object| object.to_s }.join("\n")
   end
 
   def count_by(attribute, objects_array)
-    hash_key = objects_array[0].send(attribute)
-    return Hash[hash_key, objects_array.count]
+    new_hash = {}
+    objects_array.each do |object|
+      attribute_name = object.send(attribute)
+      if new_hash.key?(attribute_name)
+        new_hash["#{attribute_name}"] += 1
+      else
+        new_hash["#{attribute_name}"] = 1
+      end
+    end
+    return new_hash
   end
 
   def count_by_name(objects_array)

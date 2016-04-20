@@ -39,20 +39,21 @@ class Udacidata
     end
   
     def find(id)
-      all[id - 1]
+      found = all.find { |object| object.send(:id) == id }
+      return found ? found : (raise IDNotFoundError, "no object with id: #{id} exists")
     end
 
     def destroy(id)
-      replace(id)
+      replace(id) || (raise IDNotFoundError, "no object with id: #{id} exists")
     end
 
     def where(op={})
       objects = all
-      found_objects = []
+      found_objects_list = []
       op.each do |key, val|
-        found_objects << objects.find_all { |obj| obj.send(key) == val }
+        found_objects_list << objects.select { |obj| obj.send(key) == val }
       end
-      found_objects.reduce(:&)
+      found_objects_list.reduce(:&).flatten 
     end
 
     def append_to_csv(*objects)
@@ -71,21 +72,21 @@ class Udacidata
 
     def replace(id, new_obj = false)
       objects = all
-      return_object = objects.slice!(id - 1)
+      i = objects.index { |obj| obj.send(:id) == id }
+      return_object = i ? objects.slice!(i) : false
       
       if new_obj
-        objects.insert((id - 1), new_obj) 
+        objects.insert(i, new_obj) 
         return_object = new_obj
       end
       
-      clean_csv(objects[0].attr_keys)
-      append_to_csv(*objects)     
+      clean_csv(objects[0].attr_keys) if return_object
+      append_to_csv(*objects) if return_object
       
       return return_object
     end
 
   end
-
 
   def in_csv?
     selected = false
@@ -95,8 +96,8 @@ class Udacidata
     return selected
   end
 
-  def print_ready_string
-    self.attr_keys.zip(attr_values).each { |pair| pair.join(": ") }.join(", ")
+  def to_s
+    self.attr_keys.zip(attr_values).join(", ")
   end
 
   def attr_keys

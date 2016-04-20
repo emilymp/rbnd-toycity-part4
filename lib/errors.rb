@@ -1,5 +1,5 @@
 # Your custom error classes will be placed here
-class NotFoundError < StandardError
+class IDNotFoundError < StandardError
 end
 
 
